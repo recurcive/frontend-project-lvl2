@@ -1,0 +1,41 @@
+{
+  "name": "@hexlet/code",
+  "version": "1.0.0",
+  "description": "GenDiff.Hexlet.Practice",
+  "bin": {
+    "gendiff": "dist/bin/gendiff.js"
+  },
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "NODE_ENV=production babel src --out-dir dist --source-maps inline"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/recurcive/frontend-project-lvl2.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/recurcive/frontend-project-lvl2/issues"
+  },
+  "homepage": "https://github.com/recurcive/frontend-project-lvl2#readme",
+  "dependencies": {
+    "commander": "^6.2.1"
+  },
+  "devDependencies": {
+    "babel-cli": "",
+    "babel-core": "*",
+    "babel-preset-env": "*",
+    "babel-preset-stage-0": "*",
+    "eslint": "*",
+    "eslint-config-airbnb-base": "*",
+    "eslint-plugin-import": "*",
+    "babel-eslint": "*",
+    "jest": "*",
+    "jest-cli": "*"
+  },
+  "files": [
+    "dist"
+  ]
+}
