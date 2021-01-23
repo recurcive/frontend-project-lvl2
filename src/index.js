@@ -1,9 +1,19 @@
 import fs from 'fs';
+import path from 'path';
 import _ from 'lodash';
+import * as yaml from 'js-yaml';
 
 const getFileContent = (fileName) => fs.readFileSync(fileName, 'utf8');
 
-const getObject = (content) => JSON.parse(content);
+const getObject = (extName, content) => {
+  if (extName === '.json') {
+    return JSON.parse(content);
+  }
+  if (_.includes(['.yaml', '.yml'], extName)) {
+    return yaml.load(content);
+  }
+  throw new Error(`Неизвестный формат файлов: '${extName}'! Разрешены только следующие форматы: json, yaml`);
+};
 
 const getKeys = (json1, json2) => _.union(_.keys(json1), _.keys(json2));
 
@@ -21,8 +31,9 @@ const calculateDiff = (keys, object1, object2) => keys.map((key) => {
 });
 
 const genDiff = (firstFile, secondFile) => {
-  const object1 = getObject(getFileContent(firstFile));
-  const object2 = getObject(getFileContent(secondFile));
+  const extName = path.extname(firstFile);
+  const object1 = getObject(extName, getFileContent(firstFile));
+  const object2 = getObject(extName, getFileContent(secondFile));
 
   const keys = getKeys(object1, object2).sort();
 

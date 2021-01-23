@@ -13,3 +13,8 @@ test('check json', () => {
   const result = fs.readFileSync(getFixturePath('result_json.txt'), 'utf8');
   expect(genDiff(getFixturePath('file1.json'), getFixturePath('file2.json'))).toBe(result);
 });
+
+test('check yaml', () => {
+  const result = fs.readFileSync(getFixturePath('result_json.txt'), 'utf8');
+  expect(genDiff(getFixturePath('file1.yml'), getFixturePath('file2.yml'))).toBe(result);
+});
