@@ -11,7 +11,5 @@ const getFixturePath = (filename) => path.join(__dirname, '..', '__fixtures__', 
 
 test('check json', () => {
   const result = fs.readFileSync(getFixturePath('result_json.txt'), 'utf8');
-  expect(genDiff('/Users/kseniaselezneva/Hexlet/frontend-project-lvl2/__fixtures__/file1.json', '/Users/kseniaselezneva/Hexlet/frontend-project-lvl2/__fixtures__/file2.json')).toBe(result);
+  expect(genDiff(getFixturePath('file1.json'), getFixturePath('file2.json'))).toBe(result);
 });
-
-//  expect(genDiff(getFixturePath('file1.json'), getFixturePath('file2.json'))).toBe(result);

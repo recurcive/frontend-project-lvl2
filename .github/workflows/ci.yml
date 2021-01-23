@@ -1,0 +1,40 @@
+name: build
+
+on:
+  push:
+    branches:
+      - '**'
+    tags:
+      - '**'
+
+jobs:
+  test:
+    name: test gendiff
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@master
+        with:
+          node-version: 14
+      - run: make install
+      - run: make lint
+      - run: make test
+  coverage:
+    needs: [ test ]
+    name: coverage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@master
+        with:
+          node-version: '14'
+      - run: npm install -g yarn
+      - run: make install
+      - run: make lint
+      - run: make test
+      - uses: paambaati/codeclimate-action@v2.7.2
+        env:
+          CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+        with:
+          coverageCommand: make test-coverage
+          debug: true
