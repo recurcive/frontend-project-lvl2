@@ -5,7 +5,19 @@
 
 ##Setup
 
-make install
+```sh
+$ make install
+```
+
+## Run tests
+
+```sh
+$ make test
+```
+
 ##Usage
 
-gendiff -h
+```sh
+gendiff file1.json file2.json
+```
+

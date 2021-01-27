@@ -14,7 +14,7 @@ extends:
   - 'plugin:jest/recommended'
 
 parserOptions:
-  ecmaVersion: 2020
+  ecmaVersion: 11
   sourceType: module
 
 rules:
@@ -22,5 +22,3 @@ rules:
   import/extensions: 0 # FIXME: remove when rule will be adjusted for new nodejs version
   no-underscore-dangle: [2, { "allow": ["__filename", "__dirname"] }]
 
-overrides:
-  - files: [dist]
