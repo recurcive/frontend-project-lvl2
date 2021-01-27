@@ -3,8 +3,6 @@ import path from 'path';
 import _ from 'lodash';
 import * as yaml from 'js-yaml';
 
-const space = 4;
-
 const getFileContent = (fileName) => fs.readFileSync(fileName, 'utf8');
 
 const getObject = (extName, content) => {
@@ -19,15 +17,7 @@ const getObject = (extName, content) => {
 
 export const getSortedKeys = (json1, json2) => _.union(_.keys(json1), _.keys(json2)).sort();
 
-const sign = {
-  DELETED: '- ',
-  EQUAL: '  ',
-  CHANGED: '',
-  ADDED: '+ ',
-  NESTED: '',
-};
-
-export const generateAst = (keys, object1, object2, depth = 1) => keys.flatMap((key) => {
+export const generateAst = (keys, object1, object2, depth = 1) => keys.map((key) => {
   if (_.has(object1, key) && _.has(object2, key)) {
     if (object1[key] === object2[key]) {
       return {
@@ -50,7 +40,7 @@ export const generateAst = (keys, object1, object2, depth = 1) => keys.flatMap((
         ),
       };
     }
-    return [
+    /*    return [
       {
         node: 'DELETED',
         key,
@@ -63,7 +53,14 @@ export const generateAst = (keys, object1, object2, depth = 1) => keys.flatMap((
         value: object2[key],
         depth,
       },
-    ];
+    ]; */
+    return {
+      node: 'UPDATED',
+      key,
+      valueOld: object1[key],
+      valueNew: object2[key],
+      depth,
+    };
   }
   if (_.has(object1, key) && !_.has(object2, key)) {
     return {
@@ -81,43 +78,7 @@ export const generateAst = (keys, object1, object2, depth = 1) => keys.flatMap((
   };
 });
 
-const spaceCounter = (depth, token = '') => ' '.repeat(depth * space - token.length);
-
-const renderValue = (value, depth) => {
-  if (_.isArray(value)) {
-    return value.map((val) => renderValue(val)).join('\n');
-  }
-  if (_.isObject(value)) {
-    const entries = Object.entries(value);
-    const nestedDepth = depth + 1;
-    const values = entries.map(([key, val]) => {
-      if (_.isObject(val)) {
-        return `${spaceCounter(nestedDepth)}${key}: ${renderValue(val, depth + 1)}`;
-      }
-      return `${spaceCounter(nestedDepth)}${key}: ${val}`;
-    });
-
-    return `{\n${values.join('\n')}\n${spaceCounter(depth)}}`;
-  }
-  return value;
-};
-
-export const stylish = (ast) => {
-  const jsonFormatter = (nested) => nested.map((node) => {
-    if (node.node === 'NESTED') {
-      return `${spaceCounter(node.depth)}${node.key}: {\n${renderValue(
-        jsonFormatter(node.children),
-      )}\n${spaceCounter(node.depth)}}`;
-    }
-    return `${spaceCounter(node.depth, sign[node.node])}${sign[node.node]}${
-      node.key
-    }: ${renderValue(node.value, node.depth)}`;
-  });
-
-  return `{\n${jsonFormatter(ast).join('\n')}\n}`;
-};
-
-const genDiff = (firstFile, secondFile) => {
+const genDiff = (firstFile, secondFile, format) => {
   const extName = path.extname(firstFile);
   const object1 = getObject(extName, getFileContent(firstFile));
 
@@ -125,9 +86,9 @@ const genDiff = (firstFile, secondFile) => {
 
   const keys = getSortedKeys(object1, object2).sort();
 
-  const nestedDiff = generateAst(keys, object1, object2);
+  const diff = generateAst(keys, object1, object2);
 
-  return stylish(nestedDiff);
+  return format(diff);
 };
 
 export default genDiff;
