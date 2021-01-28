@@ -28,12 +28,12 @@ test('check yaml', () => {
 });
 
 test('check nested json', () => {
-  const result = fs.readFileSync(getFixturePath('nested_result_json.txt'), 'utf8');
+  const result = fs.readFileSync(getFixturePath('nested_result_stylish.txt'), 'utf8');
   expect(genDiff(getFixturePath('nested_file1.json'), getFixturePath('nested_file2.json'), stylish)).toBe(result);
 });
 
 test('check nested yaml', () => {
-  const result = fs.readFileSync(getFixturePath('nested_result_json.txt'), 'utf8');
+  const result = fs.readFileSync(getFixturePath('nested_result_stylish.txt'), 'utf8');
   expect(genDiff(getFixturePath('nested_file1.yml'), getFixturePath('nested_file2.yml'), stylish)).toBe(result);
 });
 

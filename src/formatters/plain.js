@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-const textWrapper = (value) => (_.isString(value) || _.isNumber(value) ? `'${value}'` : value);
+const textWrapper = (value) => _.isString(value) ? `'${value}'` : value;
 
 const printPlainValue = (value) => (_.isObject(value) ? '[complex value]' : textWrapper(value));
 
