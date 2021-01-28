@@ -22,3 +22,6 @@ gendiff --format stylish file1.json file2.json
 gendiff --format plain file1.json file2.json
 ```
 
+### Asciinema
+https://asciinema.org/a/yy4ajOprQyAStbQhUaNPs51BD
+
