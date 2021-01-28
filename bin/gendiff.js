@@ -8,9 +8,9 @@ program
   .version('1.0.0')
   .arguments('<firstFile> <secondFile>')
   .description('Compares two configuration files and shows a difference.')
-  .option('-f, --format <type>', 'output format', 'stylish')
+  .option('-f, --format [type]', 'output format', 'stylish')
   .action((firstFile, secondFile) => {
-    console.log(genDiff(firstFile, secondFile, getFormatter(program.opts().format)));
+    console.log(genDiff(firstFile, secondFile, getFormatter(program.format)));
   })
   .parse(process.argv);
 

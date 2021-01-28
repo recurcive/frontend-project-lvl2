@@ -81,7 +81,6 @@ export const generateAst = (keys, object1, object2, depth = 1) => keys.map((key)
 const genDiff = (firstFile, secondFile, format) => {
   const extName = path.extname(firstFile);
   const object1 = getObject(extName, getFileContent(firstFile));
-
   const object2 = getObject(extName, getFileContent(secondFile));
 
   const keys = getSortedKeys(object1, object2).sort();
