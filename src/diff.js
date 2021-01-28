@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import _ from 'lodash';
 import * as yaml from 'js-yaml';
+import getFormatter from './formatters/index.js';
 
 const getFileContent = (fileName) => fs.readFileSync(fileName, 'utf8');
 
@@ -15,80 +16,67 @@ const getObject = (extName, content) => {
   throw new Error(`Неизвестный формат файлов: '${extName}'! Разрешены только следующие форматы: json, yaml`);
 };
 
-export const getSortedKeys = (json1, json2) => _.union(_.keys(json1), _.keys(json2)).sort();
+export const getSortedKeys = (json1, json2) => _.sortBy(_.union(_.keys(json1), _.keys(json2)));
 
-export const generateAst = (keys, object1, object2, depth = 1) => keys.map((key) => {
-  if (_.has(object1, key) && _.has(object2, key)) {
-    if (object1[key] === object2[key]) {
+export const generateAst = (object1, object2) => {
+  const iter = (keys, innerObject1, innerObject2, depth = 1) => keys.map((key) => {
+    if (_.has(innerObject1, key) && _.has(innerObject2, key)) {
+      if (innerObject1[key] === innerObject2[key]) {
+        return {
+          node: 'EQUAL',
+          key,
+          value: innerObject1[key],
+          depth,
+        };
+      }
+      if (_.isObject(innerObject1[key]) && _.isObject(innerObject2[key])) {
+        return {
+          node: 'NESTED',
+          key,
+          depth,
+          children: iter(
+            getSortedKeys(innerObject1[key], innerObject2[key]),
+            innerObject1[key],
+            innerObject2[key],
+            depth + 1,
+          ),
+        };
+      }
       return {
-        node: 'EQUAL',
+        node: 'UPDATED',
         key,
-        value: object1[key],
+        valueOld: innerObject1[key],
+        valueNew: innerObject2[key],
         depth,
       };
     }
-    if (_.isObject(object1[key]) && _.isObject(object2[key])) {
+    if (_.has(innerObject1, key) && !_.has(innerObject2, key)) {
       return {
-        node: 'NESTED',
-        key,
-        depth,
-        children: generateAst(
-          getSortedKeys(object1[key], object2[key]),
-          object1[key],
-          object2[key],
-          depth + 1,
-        ),
-      };
-    }
-    /*    return [
-      {
         node: 'DELETED',
         key,
-        value: object1[key],
+        value: innerObject1[key],
         depth,
-      },
-      {
-        node: 'ADDED',
-        key,
-        value: object2[key],
-        depth,
-      },
-    ]; */
+      };
+    }
     return {
-      node: 'UPDATED',
+      node: 'ADDED',
       key,
-      valueOld: object1[key],
-      valueNew: object2[key],
+      value: innerObject2[key],
       depth,
     };
-  }
-  if (_.has(object1, key) && !_.has(object2, key)) {
-    return {
-      node: 'DELETED',
-      key,
-      value: object1[key],
-      depth,
-    };
-  }
-  return {
-    node: 'ADDED',
-    key,
-    value: object2[key],
-    depth,
-  };
-});
+  });
+
+  return iter(getSortedKeys(object1, object2), object1, object2);
+};
 
 const genDiff = (firstFile, secondFile, format) => {
   const extName = path.extname(firstFile);
   const object1 = getObject(extName, getFileContent(firstFile));
-
   const object2 = getObject(extName, getFileContent(secondFile));
 
-  const keys = getSortedKeys(object1, object2).sort();
+  const diff = generateAst(object1, object2);
 
-  const diff = generateAst(keys, object1, object2);
-
-  return format(diff);
+  return getFormatter(format)(diff);
 };
 
 export default genDiff;
