@@ -2,7 +2,7 @@ import { test, expect } from '@jest/globals';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import path, { dirname } from 'path';
-import genDiff from '../src/diff';
+import genDiff from '../src/diff.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -41,7 +41,7 @@ test('check plain formatter', () => {
 
 test('check file unknown exception', () => {
   const testException = () => genDiff(getFixturePath('file1.jpg'), getFixturePath('file2.yml'), 'plain');
-  const result = 'Неизвестный формат файлов: \'.jpg\'! Разрешены только следующие форматы: json, yaml';
+  const result = 'Неизвестный формат файлов: \'jpg\'! Разрешены только следующие форматы: json, yaml';
   expect(testException).toThrowError(result);
 });
 
