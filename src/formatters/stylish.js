@@ -2,6 +2,12 @@ import _ from 'lodash';
 
 const space = 4;
 
+const sign = {
+  deleted: '- ',
+  equal: '  ',
+  added: '+ ',
+};
+
 const spaceCounter = (depth, token = '') => ' '.repeat(depth * space - token.length);
 
 const renderValue = (value, depth) => {
@@ -23,26 +29,20 @@ const renderValue = (value, depth) => {
   return value;
 };
 
-const sign = {
-  DELETED: '- ',
-  EQUAL: '  ',
-  ADDED: '+ ',
-};
-
 const stylish = (ast) => {
-  const jsonFormatter = (nested) => nested.map((node) => {
-    if (node.node === 'NESTED') {
-      return `${spaceCounter(node.depth)}${node.key}: {\n${renderValue(
-        jsonFormatter(node.children),
-      )}\n${spaceCounter(node.depth)}}`;
+  const stylishFormatter = (nested, depth) => nested.map((node) => {
+    if (node.type === 'nested') {
+      return `${spaceCounter(depth)}${node.key}: {\n${renderValue(
+        stylishFormatter(node.children, depth + 1),
+      )}\n${spaceCounter(depth)}}`;
     }
-    if (node.node === 'UPDATED') {
-      return `${spaceCounter(node.depth, sign.DELETED)}${sign.DELETED}${node.key}: ${renderValue(node.valueOld, node.depth)}\n${spaceCounter(node.depth, sign.ADDED)}${sign.ADDED}${node.key}: ${renderValue(node.valueNew, node.depth)}`;
+    if (node.type === 'updated') {
+      return `${spaceCounter(depth, sign.deleted)}${sign.deleted}${node.key}: ${renderValue(node.valueOld, depth)}\n${spaceCounter(depth, sign.added)}${sign.added}${node.key}: ${renderValue(node.valueNew, depth)}`;
     }
-    return `${spaceCounter(node.depth, sign[node.node])}${sign[node.node]}${node.key}: ${renderValue(node.value, node.depth)}`;
+    return `${spaceCounter(depth, sign[node.type])}${sign[node.type]}${node.key}: ${renderValue(node.value, depth)}`;
   });
 
-  return `{\n${jsonFormatter(ast).join('\n')}\n}`;
+  return `{\n${stylishFormatter(ast, 1).join('\n')}\n}`;
 };
 
 export default stylish;

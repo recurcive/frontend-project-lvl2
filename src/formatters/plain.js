@@ -6,14 +6,14 @@ const printPlainValue = (value) => (_.isObject(value) ? '[complex value]' : text
 
 const plain = (ast) => {
   const plainFormatter = (nested, parentKey = []) => nested.flatMap((node) => {
-    switch (node.node) {
-      case 'NESTED':
+    switch (node.type) {
+      case 'nested':
         return plainFormatter(node.children, [...parentKey, node.key]);
-      case 'ADDED':
+      case 'added':
         return `Property '${[...parentKey, node.key].join('.')}' was added with value: ${printPlainValue(node.value)}`;
-      case 'DELETED':
+      case 'deleted':
         return `Property '${[...parentKey, node.key].join('.')}' was removed`;
-      case 'UPDATED':
+      case 'updated':
         return `Property '${[...parentKey, node.key].join('.')}' was updated. From ${printPlainValue(node.valueOld)} to ${printPlainValue(node.valueNew)}`;
       default:
         return [];

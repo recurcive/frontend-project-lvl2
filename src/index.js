@@ -1,18 +1,18 @@
 import formatter from './formatters/index.js';
-import {
-  generateAst, getFileContent, getFormat, getObject,
-} from './utils/utils.js';
+import { getFileContent, getFormat, getObject } from './parser.js';
+import generateAst from './generator.js';
 
 const genDiff = (firstFilePath, secondFilePath, format) => {
-  const extName = getFormat(firstFilePath);
+  const format1 = getFormat(firstFilePath);
+  const format2 = getFormat(secondFilePath);
 
   const firstFileContent = getFileContent(firstFilePath);
   const secondFileContent = getFileContent(secondFilePath);
 
-  const object1 = getObject(extName, firstFileContent);
-  const object2 = getObject(extName, secondFileContent);
+  const data1 = getObject(format1, firstFileContent);
+  const data2 = getObject(format2, secondFileContent);
 
-  const ast = generateAst(object1, object2);
+  const ast = generateAst(data1, data2);
 
   return formatter(format, ast);
 };
